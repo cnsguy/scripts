@@ -1,3 +1,5 @@
+from itertools import product
+
 class Or:
     def __init__(self, lhs, rhs):
         self.lhs = lhs
@@ -28,37 +30,20 @@ class ValueRef:
     def eval(self, values):
         return values[self.value_idx]
 
-def next_value(values):
-    idx = len(values) - 1
-
-    while True:
-        if idx == -1: # 0 is obviously a valid index, hence this is the termination condition
-            return None
-
-        if values[idx] != True:
-            break
-
-        values[idx] = False
-        idx -= 1
-
-    values[idx] = True
-    return values
-
-def sat(expr, values):
+def sat(expr, num_values):
     results = []
 
-    while values is not None:
-        if expr.eval(values):
-            results.append([x for x in values])
+    for value in product([True, False], repeat = num_values):
+        print(value)
 
-        values = next_value(values)
+        if expr.eval(value):
+            results.append(value)
 
     return results
 
 def main():
-    start_values = [False] * 2
-    expr = Or(ValueRef(0), Not(ValueRef(1)))
-    results = sat(expr, start_values)
+    expr = Or(ValueRef(0), ValueRef(1))
+    results = sat(expr, 2)
 
     for result in results:
         print("Satisfies expression:", result)
